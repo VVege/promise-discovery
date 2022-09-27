@@ -1,11 +1,35 @@
+enum VGPromiseState {
+  pending,
+  fulfilled = 0,
+  rejected,
+}
 export class VGPromise {
+  then: () => void;
+  catch: (err: unknown) => void;
+  private _state = VGPromiseState.pending;
+  private _resolve: (() => void) | undefined;
+  private _reject: ((err: unknown) => void) | undefined;
 
-    private _resolve: (() => void) | undefined;
-    private _reject: (() => void) | undefined;
-  constructor(ddd: (resolve: () => void, reject: () => void) => void) {
-    this._resolve = ddd.arguments.resolve;
-    this._reject = ddd.arguments.reject;
-    ddd()
+  constructor(ddd: (resolve: () => void, reject: (err: unknown) => void) => void) {
+
+    this._state = VGPromiseState.pending;
+    this._resolve = () => {
+      this._state = VGPromiseState.fulfilled;
+      this.then();
+    };
+
+    this._reject = (err: unknown) => {
+      this._state = VGPromiseState.rejected;
+      this.catch(err);
+    };
+
+    this.then = () => {
+
+    };
+    this.catch = (err: unknown) => {
+
+    };
+    ddd(this._resolve, this._reject);
   }
 }
 
@@ -16,4 +40,6 @@ const vgP = new VGPromise((resolve, reject) => {
   resolve();
 });
 
-
+new Promise<void>((resolve, reject) => {
+  
+})
